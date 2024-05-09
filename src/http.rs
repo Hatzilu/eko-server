@@ -43,10 +43,7 @@ impl HttpMethod {
 }
 
 #[derive(Debug)]
-pub struct Request <'a>{
-    pub url: &'a str,
-    pub method: HttpMethod,
-    pub http_version: &'a str,
+pub struct Request{
     // pub stream: TcpStream,
     pub headers: HashMap<String, String>,
 }
@@ -55,6 +52,14 @@ fn get_header_values(headers: &Vec<String>) -> HashMap::<String, String> {
     let mut map = HashMap::<String, String>::new();
     for val in headers.into_iter() {
         if !val.contains(": ") {
+            let iter = val.split(" ").collect::<Vec::<&str>>();
+            let method = iter.get(0).expect("Failed to get method").to_string();
+            let url = iter.get(1).expect("failed to get url").to_string();
+            let http_version = iter.get(2).expect("failed to get HTTP version").to_string();
+
+            map.insert("method".to_string(), method);
+            map.insert("url".to_string(), url);
+            map.insert("http_version".to_string(), http_version);
             continue;
         }
         let split_header = val.split(": ").collect::<Vec::<&str>>();
@@ -82,28 +87,30 @@ impl Request {
         let http_request = request_stream_to_vec(&stream);
 
         
-        let method = http_request.get(0).expect("balls");
         
         let headers = get_header_values(&http_request);
 
 
-        let method_array = method.split(" ").collect::<Vec::<&str>>();
-        let method_string = method_array.get(0).expect("Failed to get method");
-        let url = method_array.get(1).expect("Failed to get method");
-        let http_version = method_array.get(2).expect("Failed to get method");
-
-
-        let method = HttpMethod::from(&method_string).expect("Failed toget method");
         
         return Request {
-            method,
-            url,
-            http_version,
             headers,
         }
     }
+    pub fn url(&self) -> Option<&String> {
+        self.headers.get("url")
+    }
+    pub fn method(&self) -> Option<&String> {
+        self.headers.get("method")
+    }
 }
 
-// impl fmt::Display for R
+impl fmt::Display for Request {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for (key, value) in self.headers.iter() {
+            write!(f, "Key: {} | Value: {} \r\n", key, value).expect("Failed to display Request headers");
+        }
+        Ok(())
+    }
+}
 
 

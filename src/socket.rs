@@ -16,7 +16,7 @@ pub fn handle_connection(mut stream: TcpStream) {
 
     let req = Request::new(stream);
 
-    println!("{:#?}", req);
+    println!("{} {}", &req.method().expect("failed to get method for print"), &req.url().expect("failed to get url for print"));
     // let buf_reader = BufReader::new(&mut stream);
     // let http_request: Vec<_> = buf_reader
     //     .lines()
