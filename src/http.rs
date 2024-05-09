@@ -65,9 +65,11 @@ impl Request {
 
 impl fmt::Display for Request {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Request {{\r\n").expect("Failed to display Request headers");
         for (key, value) in self.headers.iter() {
-            write!(f, "Key: {} | Value: {} \r\n", key, value).expect("Failed to display Request headers");
+            write!(f, "\t{}: {} \r\n", key, value).expect("Failed to display Request headers");
         }
+        write!(f, "}}").expect("Failed to display Request headers");
         Ok(())
     }
 }
