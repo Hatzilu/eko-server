@@ -16,7 +16,7 @@ fn main() {
 
         let stream = connection.expect("Failed to get connection");
         
-        handle_connection(stream);
+        handle_connection(stream, &config.endpoint_url);
     }
     println!("Hello, world!");
 }
