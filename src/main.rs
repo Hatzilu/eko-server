@@ -1,4 +1,4 @@
-use std::{collections::HashMap, net::{SocketAddr, TcpListener}};
+use std::{collections::HashMap, io::Write, net::{SocketAddr, TcpListener}};
 
 use ekoloko_server::Config;
 
@@ -23,7 +23,25 @@ fn main() {
 
         let url = req.url().expect("Failed to get request URL");
         
+        println!("{}",&req);
+        
+        // ignore requests not directed to /socket
         if !url.ends_with(&config.endpoint_url) {
+            continue;
+        }
+
+        // ignore non-websocket requests
+        if !req.headers.contains_key("Upgrade") {
+            let response = "HTTP/1.1 426 Upgrade Required\r\n\r\nUpgrade: websocket\r\n\r\nConnection: Upgrade";
+            stream.write_all(response.as_bytes()).expect("Failed to write 426 response to connection");
+            continue;
+        }
+
+        // verify the upgrade header contains "websocket" value
+        let upgrade_header_value = req.headers.get("Upgrade").expect("Failed to get Upgrade header").as_str();
+        if upgrade_header_value.to_lowercase() != "websocket" {
+            let response = "HTTP/1.1 426 Upgrade Required\r\n\r\nUpgrade: websocket\r\n\r\nConnection: Upgrade";
+            stream.write_all(response.as_bytes()).expect("Failed to write 426 response to connection");
             continue;
         }
     
