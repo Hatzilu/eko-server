@@ -3,6 +3,7 @@ use std::net::TcpListener;
 use ekoloko_server::Config;
 
 pub mod socket;
+pub mod http;
 
 use crate::socket::handle_connection;
 
