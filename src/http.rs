@@ -1,5 +1,5 @@
 use core::fmt;
-use std::{collections::HashMap, io::{BufRead, BufReader}, net::TcpStream};
+use std::{collections::HashMap, io::{BufRead, BufReader}, net::{SocketAddr, TcpStream}};
 
 
 
@@ -7,6 +7,7 @@ use std::{collections::HashMap, io::{BufRead, BufReader}, net::TcpStream};
 pub struct Request{
     // pub stream: TcpStream,
     pub headers: HashMap<String, String>,
+    pub peer_addr: SocketAddr,
 }
 
 fn get_header_values(headers: &Vec<String>) -> HashMap::<String, String> {
@@ -48,8 +49,10 @@ impl Request {
         
         let headers = get_header_values(&http_request);
         
+        let peer_addr = stream.peer_addr().expect("Failed to get peer IP address");
         return Request {
             headers,
+            peer_addr
         }
     }
     pub fn url(&self) -> Option<&String> {
