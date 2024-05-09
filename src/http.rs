@@ -1,46 +1,7 @@
 use core::fmt;
 use std::{collections::HashMap, io::{BufRead, BufReader}, net::TcpStream};
 
-#[derive(Debug)]
-pub enum HttpMethod {
-    GET,
-    POST,
-    PUT,
-    PATCH
-}
 
-#[derive(Debug)]
-pub struct HttpMethodError;
-
-impl fmt::Display for HttpMethodError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Invalid method")
-    }
-}
-
-impl HttpMethod {
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            HttpMethod::GET => "GET",
-            HttpMethod::POST => "POST",
-            HttpMethod::PUT => "PUT",
-            HttpMethod::PATCH => "PATCH",
-        }
-    }
-
-    pub fn from(s: &str) -> Result<HttpMethod, HttpMethodError> {
-
-        let enum_value = match s {
-             "GET" => Ok(HttpMethod::GET),
-             "POST" => Ok(HttpMethod::POST),
-             "PUT" => Ok(HttpMethod::PUT),
-             "PATCH" => Ok(HttpMethod::PATCH),
-             &_ => Err(HttpMethodError),
-        };
-
-        return enum_value;
-    }
-}
 
 #[derive(Debug)]
 pub struct Request{
@@ -82,15 +43,10 @@ fn request_stream_to_vec(mut stream: &TcpStream) -> Vec<String>{
 }
 
 impl Request {
-    pub fn new(stream: TcpStream) -> Request {
-
-        let http_request = request_stream_to_vec(&stream);
-
-        
+    pub fn new(stream: &TcpStream) -> Request {
+        let http_request = request_stream_to_vec(stream);
         
         let headers = get_header_values(&http_request);
-
-
         
         return Request {
             headers,

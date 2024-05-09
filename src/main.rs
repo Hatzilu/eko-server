@@ -14,9 +14,9 @@ fn main() {
     println!("Server listening on {}", &config.addr);
     for connection in listener.incoming() {
 
-        let stream = connection.expect("Failed to get connection");
+        let mut stream = connection.expect("Failed to get connection");
         
-        handle_connection(stream, &config.endpoint_url);
+        handle_connection(&mut stream, &config.endpoint_url);
     }
     println!("Hello, world!");
 }

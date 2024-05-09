@@ -1,18 +1,8 @@
-use std::{env, fs, io::{BufRead, BufReader, Write}, net::TcpStream};
+use std::{fs, io::Write, net::TcpStream};
 
 use crate::http::Request;
 
-
-pub struct Socket {
-    
-}
-
-
-pub fn is_socket(req: Request) {
-
-}
-
-pub fn handle_connection(stream: TcpStream, endpoint_url: &String) {
+pub fn handle_connection(stream: &mut TcpStream, endpoint_url: &String) {
 
     let req = Request::new(stream);
 
