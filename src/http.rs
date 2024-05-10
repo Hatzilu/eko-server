@@ -74,4 +74,43 @@ impl fmt::Display for Request {
     }
 }
 
+pub struct ResponseBuilder {
+    response: String
+}
 
+impl ResponseBuilder {
+    pub fn new() -> ResponseBuilder {
+        ResponseBuilder{
+            response: String::from("HTTP/1.1")
+        }
+    }
+    pub fn build(self) -> String {
+        self.response
+    }
+    pub fn status(mut self, status: &u16) -> ResponseBuilder {
+        let status_string = match status {
+            200 => "200 OK",
+            400 => "400 Bad Request",
+            426 => "426 Upgrade Required",
+            _ => todo!("TODO handle edge cases with invalid status codes"),
+        };
+
+        if !self.response.ends_with(" ") {
+            self.response.push_str(" ");
+        }
+        self.response.push_str(&status_string);
+        self.response.push_str("\r\n");
+        
+        return self
+    }
+    pub fn header(mut self, header: &str, value: &str) -> ResponseBuilder {
+        let new_header = format!("{}: {}",&header, &value);
+        if !self.response.ends_with(" ") {
+            self.response.push_str(" ");
+        }
+        self.response.push_str(&new_header);
+        self.response.push_str("\r\n");
+
+        return self
+    }
+}
