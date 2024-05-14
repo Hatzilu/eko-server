@@ -23,40 +23,26 @@ fn main() {
 
         let url = req.url().expect("Failed to get request URL");
         
-        println!("{}",&req);
         
+        println!("{}",&req);
+
         // ignore requests not directed to /socket
-        if !url.ends_with(&config.endpoint_url) {
+        if !url.contains(&config.endpoint_url) {
             continue;
         }
-
-        // ignore non-websocket requests
-        if !req.headers.contains_key("Upgrade") {
-            let response = "HTTP/1.1 426 Upgrade Required\r\n\r\nUpgrade: websocket\r\n\r\nConnection: Upgrade";
-            stream.write_all(response.as_bytes()).expect("Failed to write 426 response to connection");
-            continue;
-        }
-
-        // verify the upgrade header contains "websocket" value
-        let upgrade_header_value = req.headers.get("Upgrade").expect("Failed to get Upgrade header").as_str();
-        if upgrade_header_value.to_lowercase() != "websocket" {
-            let response = "HTTP/1.1 426 Upgrade Required\r\n\r\nUpgrade: websocket\r\n\r\nConnection: Upgrade";
-            stream.write_all(response.as_bytes()).expect("Failed to write 426 response to connection");
-            continue;
-        }
-    
+        
         let method = req.method().expect("failed to get method for print");
-    
+        
         println!("{} {}", &method, &url);
 
-        handle_response(&mut stream);
+        handle_response(&mut stream, &config.addr);
 
         println!("added/updated socket map at {} ",&req.peer_addr);
         socket_map.insert(req.peer_addr, req);
 
-        for k in  socket_map.keys() {
-            println!("{}",&k);
-        }
+        // for k in  socket_map.keys() {
+        //     println!("{}",&k);
+        // }
     }
     println!("Hello, world!");
 }
